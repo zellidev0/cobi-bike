@@ -38,3 +38,5 @@ Having trouble with Pages? Check out our [documentation](https://help.github.com
 
 
 git add src && git commit -m "running version 0.1"
+
+git subtree push --prefix src origin gh-pages
