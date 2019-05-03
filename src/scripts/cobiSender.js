@@ -73,6 +73,11 @@ class CobiSender {
 
         this.updateSubscriptions();
 
+
+        document.getElementById('btnInit').addEventListener('click', e => {
+            this.initCobi()
+        });
+
         document.getElementById('motorCheckbox').addEventListener('change', e => {
             this.toSubscribe.motor = e.target.checked;
             this.updateSubscriptions();
