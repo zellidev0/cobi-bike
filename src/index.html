@@ -133,76 +133,36 @@
                 </div>
             </div>
 
+            <hr class="mb-4">
 
 
-            <!--&lt;!&ndash;Battery&ndash;&gt;-->
-            <!--<div class="row">-->
-            <!--<div class="col-md-6 mb-3">-->
-            <!--<label class="col-form-label" id="labelBattery" for="btnBattery">Click to receive Battery info</label>-->
-            <!--<button class="btn btn-primary btn-lg btn-block" id="btnBattery" onclick="receiveData()" type="submit">-->
-            <!--Get Battery Info-->
-            <!--</button>-->
-            <!--</div>-->
-            <!--<div class="col-md-6 mb-3">-->
-            <!--<label id="labelBatteryResult"></label>-->
-            <!--</div>-->
-            <!--</div>-->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="username">Base64(username:password)</label>
+                    <input type="text" class="form-control" id="username" placeholder="" value="" required>
+                </div>
 
-            <!--<hr class="mb-4">-->
-
-            <!--&lt;!&ndash;Motor&ndash;&gt;-->
-            <!--<div class="row">-->
-            <!--<div class="col-md-6 mb-3">-->
-            <!--<label class="col-form-label" id="labelMotor" for="btnMotor">Click to receive Motor info</label>-->
-            <!--<button class="btn btn-primary btn-lg btn-block" id="btnMotor" onclick="receiveMotor()" type="submit">-->
-            <!--Get Motor Info-->
-            <!--</button>-->
-            <!--</div>-->
-            <!--<div class="col-md-6 mb-3">-->
-            <!--<label id="labelMotorResult"></label>-->
-            <!--</div>-->
-            <!--</div>-->
-
-            <!--<div class="row">-->
-            <!--<div class="col-md-6 mb-3">-->
-            <!--<label for="firstName">First name</label>-->
-            <!--<input type="text" class="form-control" id="firstName" placeholder="" value="" required>-->
-            <!--<div class="invalid-feedback">-->
-            <!--Valid first name is required.-->
-            <!--</div>-->
-            <!--</div>-->
-            <!--<div class="col-md-6 mb-3">-->
-            <!--<label for="lastName">Last name</label>-->
-            <!--<input type="text" class="form-control" id="lastName" placeholder="" value="" required>-->
-            <!--<div class="invalid-feedback">-->
-            <!--Valid last name is required.-->
-            <!--</div>-->
-            <!--</div>-->
-            <!--</div>-->
-
-            <!--<hr class="mb-4">-->
-
-            <!--&lt;!&ndash;Location&ndash;&gt;-->
-            <!--<div class="row">-->
-            <!--<div class="col-md-6 mb-3">-->
-            <!--<label class="col-form-label" id="labelLocation" for="btnLocation">Click to receive Location info</label>-->
-            <!--<button class="btn btn-primary btn-lg btn-block" id="btnLocation" onclick="receiveLocation()" type="submit">-->
-            <!--Get Location Info-->
-            <!--</button>-->
-            <!--</div>-->
-            <!--<div class="col-md-6 mb-3">-->
-            <!--<label id="labelLocationResult"></label>-->
-            <!--</div>-->
-            <!--</div>-->
-
+                <!--Send Button-->
+                <div class="col-md-12 mb-3">
+                    <button class="btn btn-primary btn-lg btn-block" id="btnSendToInsights" type="submit">
+                        Send to Insights
+                    </button>
+                </div>
+            </div>
 
             <hr class="mb-4">
 
-            <!--Send Button-->
-            <div class="col-md-12 mb-3">
-                <button class="btn btn-primary btn-lg btn-block" id="btnSendToInsights" type="submit">
-                    Send to Insights
-                </button>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="hubToken">Hub auth token</label>
+                    <input type="text" class="form-control" id="hubToken" placeholder="" value="" required>
+                </div>
+                <!--Send Button-->
+                <div class="col-md-12 mb-3">
+                    <button class="btn btn-primary btn-lg btn-block" id="btnSendToHub" type="submit">
+                        Send to Hub -> Things
+                    </button>
+                </div>
             </div>
 
 
@@ -219,7 +179,6 @@
 </div>
 
 <script src="https://cdn.cobi.bike/cobi.js/0.44.0/cobi.js"></script>
-<script type="text/javascript" language="javascript" src="scripts/script.js"></script>
 <script type="text/javascript" language="javascript" src="scripts/cobiSender.js"></script>
 </body>
 </html>
