@@ -1,0 +1,53 @@
+{
+  "topic": "com.bosch.bcx.cobibike.julian/device_1/things/twin/commands/modify",
+  "headers": {},
+  "path": "/features/data",
+  "value": {
+    "properties": {
+      "toSubscribe": {
+        "motor": true,
+        "battery": true,
+        "mobile": true,
+        "tourService": true
+      },
+      "motorValues": {
+        "motor_assistanceIndicator": 33,
+        "motor_distance": 3638.44,
+        "range": 35353,
+        "supportedDriveModes": 4,
+        "driveMode": 2,
+        "nextService": {
+          "timestamp": 2434,
+          "distance": 3423
+        }
+      },
+      "batteryValues": {
+        "batteryLevel": 54,
+        "state": "CHARGING"
+      },
+      "mobileValues": {
+        "mobile_location": {
+          "coordinate": {
+            "latitude": 50.142997810266756,
+            "longitude": 8.638946757757973
+          },
+          "altitude": 100.92798359077034,
+          "bearing": 233.32565510469894,
+          "speed": 6.749478816986084,
+          "horizontalAccuracy": 6,
+          "verticalAccuracy": 3.003857374191284
+        },
+        "heading": 34.34234,
+        "locationAvailability": true
+      },
+      "tourServiceValues": {
+        "tourService_ridingDuration": 459.39882200956345,
+        "tourService_ridingDistance": 3379.1943992006327,
+        "tourService_ascent": 29.01789886804052,
+        "tourService_calories": 11.052172660827637,
+        "tourService_averageSpeed": 7.355687993318988
+      },
+      "subscriptions": {}
+    }
+  }
+}

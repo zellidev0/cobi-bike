@@ -156,37 +156,34 @@ class CobiSender {
 
 
     updateSubscriptions() {
-        // for (const subProp of this.motorValues) {
-        //     const subKey = motor + '_' + subProp;
-        //
-        // }
+
         if (this.toSubscribe.motor === false) {
             this.unsubscribe("motor", ["distance", "assistanceIndicator", "range", "supportedDriveModes", "driveMode", "nextService"]);
-        } else if (this.toSubscribe.motor && !this.subscriptions.motor) {
+        } else {
             this.subscribe("motor", ["distance", "assistanceIndicator", "range", "supportedDriveModes", "driveMode", "nextService"]);
         }
 
-        if (this.toSubscribe.battery === false && this.subscriptions.battery === true) {
+        if (this.toSubscribe.battery === false) {
             this.unsubscribe("battery", ["state"]);
-        } else if (this.toSubscribe.battery && !this.subscriptions.battery) {
+        } else {
             this.subscribe("battery", ["state"]);
         }
 
-        if (this.toSubscribe.mobile === false && this.subscriptions.mobile === true) {
+        if (this.toSubscribe.mobile === false) {
             this.unsubscribe("mobile", ["location", "heading", "locationAvailability"]);
-        } else if (this.toSubscribe.mobile && !this.subscriptions.mobile) {
+        } else {
             this.subscribe("mobile", ["location", "heading", "locationAvailability"]);
         }
 
-        if (this.toSubscribe.navigationService === false && this.subscriptions.navigationService === true) {
+        if (this.toSubscribe.navigationService === false) {
             this.unsubscribe("navigationService", ["route", "eta", "distanceToDestination", "status"]);
-        } else if (this.toSubscribe.navigationService && !this.subscriptions.navigationService) {
+        } else {
             this.subscribe("navigationService", ["route", "eta", "distanceToDestination", "status"]);
         }
 
-        if (this.toSubscribe.tourService === false && this.subscriptions.tourService === true) {
+        if (this.toSubscribe.tourService === false) {
             this.unsubscribe("tourService", ["calories", "ascent", "ridingDistance", "ridingDuration", "averageSpeed"]);
-        } else if (this.toSubscribe.tourService && !this.subscriptions.tourService) {
+        } else {
             this.subscribe("tourService", ["calories", "ascent", "ridingDistance", "ridingDuration", "averageSpeed"]);
         }
 
@@ -197,8 +194,9 @@ class CobiSender {
     subscribe(property, subProperties) {
         for (const subProp of subProperties) {
             const subKey = property + '_' + subProp;
+            const propertyValues = property + "Values";
             this.subscriptions[subKey] = (value, timestamp) => {
-                this.motorValues[subKey] = value;
+                this[propertyValues][subKey] = value;
                 document.getElementById(property + "Result").innerText = "Data received.";
                 console.log("AAA_" + property + "_" + subProp + " :" + value)
             };
