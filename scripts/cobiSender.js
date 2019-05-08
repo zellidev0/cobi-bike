@@ -1,13 +1,6 @@
-var url = "https://bosch-iot-insights.com/data-recorder-service/v2/zz0005657184692";
-var project = "zz0005657184692";
-var username = "zz0005657184692-dd72c48c-b718-4030-a889-428047379cf9";
-var username64 = "enowMDA1NjU3MTg0NjkyLWRkNzJjNDhjLWI3MTgtNDAzMC1hODg5LTQyODA0NzM3OWNmOQ==";
-var password = "Ls-5aaQcovgFTQoV";
-var password64 = "THMtNWFhUWNvdmdGVFFvVg==";
-var username_password_64 = "enowMDA1NjU3MTg0NjkyLWRkNzJjNDhjLWI3MTgtNDAzMC1hODg5LTQyODA0NzM3OWNmOTpMcy01YWFRY292Z0ZUUW9W";
-
-
-
+var insights_url = "https://bosch-iot-insights.com/data-recorder-service/v2/zz0005657184692";
+var hub_url = "https://http.bosch-iot-hub.com/telemetry/";
+var hub_url_lulu = "https://http.bosch-iot-hub.com/telemetry/t095a135d89f0405ca9ab579bd24546d4/COBI-04";
 
 
 class CobiSender {
@@ -56,13 +49,7 @@ class CobiSender {
             averageSpeed: undefined
         };
 
-        this.subscriptions = {
-            motor: false,
-            battery: false,
-            mobile: false,
-            navigationService: false,
-            tourService: false
-        };
+        this.subscriptions = {};
 
         this.sendInterval = undefined;
 
@@ -71,46 +58,85 @@ class CobiSender {
     run() {
         this.initCobi();
 
-        this.updateSubscriptions();
-
-
         document.getElementById('btnInit').addEventListener('click', e => {
             this.initCobi()
         });
 
         document.getElementById('motorCheckbox').addEventListener('change', e => {
+            document.getElementById('motorResult').innerHTML = "Subscribed: Waiting for data.";
             this.toSubscribe.motor = e.target.checked;
             this.updateSubscriptions();
         });
 
         document.getElementById('batteryCheckbox').addEventListener('change', e => {
+            document.getElementById('batteryResult').innerHTML = "Subscribed: Waiting for data.";
+
             this.toSubscribe.battery = e.target.checked;
             this.updateSubscriptions();
         });
 
         document.getElementById('mobileCheckbox').addEventListener('change', e => {
+            document.getElementById('mobileResult').innerHTML = "Subscribed: Waiting for data.";
+
             this.toSubscribe.mobile = e.target.checked;
             this.updateSubscriptions();
         });
 
         document.getElementById('navigationServiceCheckbox').addEventListener('change', e => {
+            document.getElementById('navigationServiceResult').innerHTML = "Subscribed: Waiting for data.";
+
             this.toSubscribe.navigationService = e.target.checked;
             this.updateSubscriptions();
         });
 
         document.getElementById('tourServiceCheckbox').addEventListener('change', e => {
+            document.getElementById('tourServiceResult').innerHTML = "Subscribed: Waiting for data.";
+
             this.toSubscribe.tourService = e.target.checked;
             this.updateSubscriptions();
         });
 
 
+        const btnInsights = document.getElementById('btnSendToInsights');
+        btnInsights.addEventListener('click', e => {
+            const s = document.getElementById("username").value;
+            let username_pw = btoa(s);
 
-        document.getElementById('btnSendToInsights').addEventListener('click', e => {
-            const result = sendOverHTTP(JSON.stringify(this));
+            if (username_pw === "") {
+                document.getElementById("username").placeholder = "Insert username:passwort";
+                return;
+            }
+
+            const result = sendOverHTTPTest(JSON.stringify(this), username_pw);
+            // const result = sendToInsights(JSON.stringify(this), username_pw);
             if (result) {
-                document.getElementById("btnSendToInsights").classList.toggle('btn-success');
+                btnInsights.classList.add('btn-success');
+                btnInsights.classList.remove('btn-danger');
             } else {
-                document.getElementById("btnSendToInsights").classList.toggle('btn-danger');
+                btnInsights.classList.add('btn-danger');
+                btnInsights.classList.remove('btn-success');
+            }
+        });
+
+        const btnHub = document.getElementById('btnSendToHub');
+        btnHub.addEventListener('click', e => {
+            let s = document.getElementById("hubToken").value.toString();
+            let hubToken = "Basic " + btoa(s);
+
+            if (hubToken === "Basic ") {
+                document.getElementById("hubToken").placeholder = "Insert hub auth token first.";
+                return;
+            }
+
+            const result = sendToHub(JSON.stringify(this), hubToken);
+            // const result = sendToHubLulu(JSON.stringify(this), hubToken);
+            // const result = sendToHub(JSON.stringify(this), hubToken);
+            if (result) {
+                btnHub.classList.add('btn-success');
+                btnHub.classList.remove('btn-danger');
+            } else {
+                btnHub.classList.remove('btn-danger');
+                btnHub.classList.add('btn-success');
             }
         });
 
@@ -130,7 +156,11 @@ class CobiSender {
 
 
     updateSubscriptions() {
-        if (this.toSubscribe.motor === false && this.subscriptions.motor === true) {
+        // for (const subProp of this.motorValues) {
+        //     const subKey = motor + '_' + subProp;
+        //
+        // }
+        if (this.toSubscribe.motor === false) {
             this.unsubscribe("motor", ["distance", "assistanceIndicator", "range", "supportedDriveModes", "driveMode", "nextService"]);
         } else if (this.toSubscribe.motor && !this.subscriptions.motor) {
             this.subscribe("motor", ["distance", "assistanceIndicator", "range", "supportedDriveModes", "driveMode", "nextService"]);
@@ -165,51 +195,50 @@ class CobiSender {
 
 
     subscribe(property, subProperties) {
+        for (const subProp of subProperties) {
+            const subKey = property + '_' + subProp;
+            this.subscriptions[subKey] = (value, timestamp) => {
+                this.motorValues[subKey] = value;
+                document.getElementById(property + "Result").innerText = "Data received.";
+                console.log("AAA_" + property + "_" + subProp + " :" + value)
+            };
+            COBI[property][subProp].subscribe(this.subscriptions[subKey]);
+        }
+
         // Example
         // COBI.motor.distance.subscribe((value, timestamp) => {
         //     this.subscriptions.motor = true;
         //     this.motorValues.distance = value;
-        //     document.getElementById("motor" + "Result").innerText = "SUCCESS";
+        //     document.getElementById("motor" + "Result").innerText = "Data received.";
         //     console.log("AAA_motor_distance" + " :" + value)
         // });
 
-        subProperties.forEach((entry) => {
-            let x = "COBI." + property + "." + entry + ".subscribe((value, timestamp) => {\n" +
-                "                this.subscriptions." + property + " = true;\n" +
-                "                this." + property + "Values." + entry + " = value;\n" +
-                "                document.getElementById(\"" + property + "\" + \"Result\").innerText = \"SUCCESS\";\n" +
-                "                console.log(\"AAA_" + entry + "\" + \" :\" + value)\n" +
-                "            });";
-            eval(x);
-        });
     }
 
     unsubscribe(property, subProperties) {
+        for (const subProp of subProperties) {
+            const subKey = property + '_' + subProp;
+            const subFunc = this.subscriptions[subKey];
+            if (subFunc) {
+                COBI[property][subProp].unsubscribe(subFunc);
+                delete this.subscriptions[subKey];
+                document.getElementById(property + "Result").innerText = "Unsubscribed, last received data stored";
+                console.log('BBB Unsubscribe: ' + subKey);
+            }
+        }
+
         //Example:
         //  COBI.motor.distance.unsubscribe((value, timestamp) => {
         //      this.subscriptions.motor = false;
         //      this.motorValues.distance = null;
-        //      document.getElementById("motor" + "Result").innerText = "";
+        //      document.getElementById("motor" + "Result").innerText = "Unsubscribed, waiting for data stream to stop.";
         //      console.log("BBB_motor_assistanceIndicator")
         //  });
-
-
-
-        subProperties.forEach((entry) => {
-            let x = "COBI." + property + "." + entry + ".unsubscribe((value, timestamp) => {\n" +
-                "                this.subscriptions." + property + " = false;\n" +
-                "                this." + property + "Values." + entry + " = null;\n" +
-                "                document.getElementById(\"" + property + "\" + \"Result\").innerText = \"\";\n" +
-                "                console.log(\"BBB_" + entry + "\")\n" +
-                "            });";
-            eval(x);
-        });
     }
 }
 
 
-
-function sendOverHTTP(json) {
+function sendToInsights(json, usrPw) {
     let httpRequest = new XMLHttpRequest();
     httpRequest.onreadystatechange = function () {
         if (httpRequest.readyState === XMLHttpRequest.DONE) {
@@ -221,20 +250,83 @@ function sendOverHTTP(json) {
             }
         }
     };
-    httpRequest.open('POST', url, true);
+    httpRequest.open('POST', hub_url, true);
     httpRequest.setRequestHeader('Content-Type', 'application/json');
-    httpRequest.setRequestHeader('Authorization', "Basic " + username_password_64);
+    httpRequest.setRequestHeader('Authorization', "Basic " + usrPw);
     httpRequest.send(json);
     console.log("AAA data was send");
     return true;
 }
 
-function sendOverHTTPTest(json) {
-    console.log("AAA" + json);
+function sendToInsightsTest(json, usrPw) {
+    console.log("AAATest" + json);
     return true;
 }
 
 
+function sendToHub(json, hubToken) {
+    let httpRequest = new XMLHttpRequest();
+    httpRequest.onreadystatechange = function () {
+        if (httpRequest.readyState === XMLHttpRequest.DONE) {
+            if (httpRequest.status === 200) {
+                console.log("HUB data send was successfull to hub");
+            } else {
+                console.log("HUB error sending data. Error code: " + httpRequest.status + ", Error message: " + httpRequest.responseText);
+                return false;
+            }
+        }
+    };
+    httpRequest.open('POST', hub_url, true);
+    httpRequest.setRequestHeader('QoS-Level', '1');
+    httpRequest.setRequestHeader('Content-Type', 'application/json');
+    httpRequest.setRequestHeader('Authorization', hubToken);
+    let s = "{" +
+        "   \"topic\": \"com.bosch.bcx.cobibike.julian/device_1/things/twin/commands/modify\"," +
+        "   \"headers\": {}," +
+        "   \"path\": \"/features/data\"," +
+        "   \"value\": {" +
+        "     \"properties\": " + json + "" +
+        "   }" +
+        "}";
+    httpRequest.send(s);
+    console.log("HUB data was send: " + s);
+    return true;
+}
+
+function sendToHubTest(json, hubToken) {
+    console.log("HUBTest" + json);
+    return true;
+}
+
+
+function sendToHubLulu(json, hubToken) {
+    let httpRequest = new XMLHttpRequest();
+    httpRequest.onreadystatechange = function () {
+        if (httpRequest.readyState === XMLHttpRequest.DONE) {
+            if (httpRequest.status === 200) {
+                console.log("HUB data send was successfull to hub");
+            } else {
+                console.log("HUB error sending data. Error code: " + httpRequest.status + ", Error message: " + httpRequest.responseText);
+                return false;
+            }
+        }
+    };
+    httpRequest.open('PUT', hub_url_lulu, true);
+    httpRequest.setRequestHeader('QoS-Level', '1');
+    httpRequest.setRequestHeader('Content-Type', 'application/json');
+    httpRequest.setRequestHeader('Authorization', hubToken);
+    let s = "{" +
+        "   \"topic\": \"com.bosch.bcx/COBI/things/twin/commands/modify\"," +
+        "   \"headers\": {}," +
+        "   \"path\": \"/features/data\"," +
+        "   \"value\": {" +
+        "     \"properties\": " + json + "" +
+        "   }" +
+        "}";
+    httpRequest.send(s);
+    console.log("HUB data was send: " + s);
+    return true;
+}
 
 new CobiSender().run();
 
